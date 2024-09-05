@@ -22,4 +22,6 @@ Restart server.
 
 ```initBotNames()``` //You can set your own bot names. Make sure there are 40 names. Look in the script for the list.
 
+```level.difficultyBotsList = [ "recruit", "hardened" , "veteran" ];``` // Add or remove "regular", "recruit", "hardened" , "veteran"
+
 Bots will appear once the initial countdown is over. You will notice that bots will be added to both teams, I don't know if it's a bug in the game but I haven't been able to get them to be added to a specific team. But don't worry, as soon as the bot quota is filled, the script will automatically set the bots to each team based on the DVAR settings.
