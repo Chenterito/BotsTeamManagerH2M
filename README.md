@@ -4,7 +4,7 @@ Script to manage bots on the server, through dvars in the CFG file you establish
 
 # How to implement.
 
-Copy the script ""MonitorBotsH2M" into "rootgame MWR\user_scripts\mp" of your server folder.
+Copy the script ""BotsTeamManagerH2M" into "rootgame MWR\user_scripts\mp" of your server folder.
 
 Set that dvars in your server configuration file with the values you want.
 
