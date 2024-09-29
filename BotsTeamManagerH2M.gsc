@@ -17,7 +17,7 @@ init()
 {	
 	SetDvarIfNotInizialized("bots_manage_add", 10);
 	SetDvarIfNotInizialized("bots_manage_fill", 10);
-    SetDvarIfNotInizialized("bots_manage_mode", 1); //1 to assign allies and axis || 0 to autoassign
+    SetDvarIfNotInizialized("bots_manage_mode", 0); //1 to assign allies and axis || 0 to autoassign
     SetDvarIfNotInizialized("bots_team_allies", 5);
 	SetDvarIfNotInizialized("bots_team_axis", 5);
     initBotNames(); // define names to bots
@@ -25,7 +25,6 @@ init()
 	thread monitorBots();
 	thread onPlayerConnect();
 	printLn("Script Loaded: BotManager");
-    
 }
 
 monitorBots()
@@ -41,7 +40,7 @@ monitorBots()
     level.botsAddtoAllies = getdvarint("bots_team_allies");
     level.botsAddtoAxis = getdvarint("bots_team_axis");
 
-    if(!level.teambased) // If it's not team game mode
+/*     if(!level.teambased) // If it's not team game mode
     {
         level.botsManageMode = 0;
         setdvar("bots_manage_mode", 0);
@@ -50,7 +49,7 @@ monitorBots()
     {
         level.botsManageMode = 1;
         setdvar("bots_manage_mode", 1);
-    }   
+    }  */  
 
 	if(level.botsToAdd > 17)
 		level.botsToAdd = 17;
@@ -65,7 +64,13 @@ monitorBots()
 		level.botsAddtoAxis = 8;
 
     if(level.botsManageMode)
+    {
         setdvar("scr_teambalance","0");
+    }
+    else
+    {
+        setdvar("scr_teambalance","1");
+    }
 	
 	if (level.botsToAdd > 0 )
 	{
@@ -75,9 +80,10 @@ monitorBots()
             {
                 addmfbot(1, "autoassign");
                 logprint("Autoassign \n");
-                wait 0.5;	
+                wait 1;	
             }
-            thread teamBots();
+            wait 1;
+            level thread teamBots();
         }
         else
         {
@@ -85,59 +91,17 @@ monitorBots()
             {
                 addmfbot(1, "allies");
                 logprint("allies \n");
-                wait 0.5;	
+                wait 1;	
             }
             for ( i = 0; i < level.botsAddtoAxis; i++ )
             {
                 addmfbot(1, "axis");
                 logprint("axis \n");
-                wait 0.5;	
+                wait 1;	
             } 
-            wait 0.5;
+            wait 1;
+            level thread modeBots();
         }
-	}
-	
-	for(;;)
-	{
-		if(!level.botsManageMode)
-        {
-            while(botCount() + playerCount() < level.botsToFill)
-            {
-                addmfbot(1, "autoassign");
-                wait 0.5;			
-            }
-
-            wait 0.5;
-
-            if( botCount() + playerCount() > level.botsToFill && botCount() > 0)
-                kickBot();
-        }
-        else
-        {
-            while(botCountAllies() + playerCountAllies() < level.botsAddtoAllies)
-            {
-                addmfbot(1, "allies");
-                wait 0.5;			
-            }
-
-            wait 0.5;
-
-            if( botCountAllies() + playerCountAllies() > level.botsAddtoAllies && botCountAllies() > 0)
-                kickBotTeam("allies");
-
-            while(botCountAxis() + playerCountAxis() < level.botsAddtoAxis)
-            {
-                addmfbot(1, "axis");;
-                wait 0.5;			
-            }
-
-            wait 0.5;
-
-            if( botCountAxis() + playerCountAxis() > level.botsAddtoAxis && botCountAxis() > 0)
-                kickBotTeam("axis");
-        }  
-
-        wait 1;            
 	}
 }
 
@@ -415,11 +379,70 @@ teamBots_loop()
 teamBots()
 {
 	level endon("game_ended");
-	for ( ;; )
-	{
-		wait 1.5;
-		teamBots_loop();
-	}
+    if(level.teambased)
+    {
+        for ( ;; )
+        {
+            while(botCount() + playerCount() < level.botsToFill)
+            {
+                addmfbot(1, "autoassign");
+                wait 1;			
+            }
+
+            wait 1;
+
+            if( botCount() + playerCount() > level.botsToFill && botCount() > 0)
+                kickBot();
+
+            wait 1.5;
+            teamBots_loop();
+        }
+    }
+    else
+    {
+        for(;;)
+        {
+            while(botCount() + playerCount() < level.botsToFill)
+            {
+                addmfbot(1, "autoassign");
+                wait 1;			
+            }
+
+            wait 1;
+
+            if( botCount() + playerCount() > level.botsToFill && botCount() > 0)
+                kickBot();
+        }
+    }	
+}
+
+modeBots()
+{
+    level endon("game_ended");
+    for(;;)
+    {
+        while(botCountAllies() + playerCountAllies() < level.botsAddtoAllies)
+        {
+            addmfbot(1, "allies");
+            wait 1;			
+        }
+
+        wait 1;
+
+        if( botCountAllies() + playerCountAllies() > level.botsAddtoAllies && botCountAllies() > 0)
+            kickBotTeam("allies");
+
+        while(botCountAxis() + playerCountAxis() < level.botsAddtoAxis)
+        {
+            addmfbot(1, "axis");;
+            wait 1;			
+        }
+
+        wait 1;
+
+        if( botCountAxis() + playerCountAxis() > level.botsAddtoAxis && botCountAxis() > 0)
+            kickBotTeam("axis");
+    }
 }
 
 set_team(team)
